@@ -25,3 +25,6 @@ gradle-app.setting
 gradle/wrapper/gradle-wrapper.properties
 
 *.db
+
+src/main/main.iml
+src/test/test.iml
