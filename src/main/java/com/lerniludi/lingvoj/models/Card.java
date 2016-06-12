@@ -1,7 +1,6 @@
 package com.lerniludi.lingvoj.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.*;
 
@@ -9,21 +8,18 @@ import javax.persistence.*;
  * Entité représentant une carte
  */
 @Entity
+@Data
 public class Card {
 
     @Id
     @GeneratedValue
-    @Getter @Setter
     private Long id;
 
     @ManyToOne
-    @Getter @Setter
     private Deck deck;
 
-    @Getter @Setter
     private String front;
 
-    @Getter @Setter
     private String back;
 
     /**

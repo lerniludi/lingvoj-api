@@ -1,7 +1,6 @@
 package com.lerniludi.lingvoj.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,18 +12,16 @@ import java.util.List;
  * Entité représentant un paquet de cartes
  */
 @Entity
+@Data
 public class Deck {
 
     @Id
     @GeneratedValue
-    @Getter @Setter
     private Long id;
 
-    @Getter @Setter
     private String name;
 
     @OneToMany(mappedBy="deck")
-    @Getter @Setter
     private List<Card> cards;
 
     /**
