@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 /**
  * Données à insérer par défaut dans la base de données
@@ -24,6 +23,7 @@ public class DatabaseLoader implements CommandLineRunner {
      * Constructeur
      *
      * @param deckRepository (required)
+     * @param cardRepository (required)
      */
     @Autowired
     public DatabaseLoader(DeckRepository deckRepository, CardRepository cardRepository) {
@@ -40,16 +40,19 @@ public class DatabaseLoader implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Création des decks
-        Deck deck1 = deckRepository.save(new Deck("Deck 1"));
-        Deck deck2 = deckRepository.save(new Deck("Deck 2"));
-        Deck deck3 = deckRepository.save(new Deck("Deck 3"));
+        Deck deck1 = new Deck("Deck 1");
+        Deck deck2 = new Deck("Deck 2");
+        Deck deck3 = new Deck("Deck 3");
+        this.deckRepository.save(Arrays.asList(deck1, deck2, deck3));
 
         // Création de 3 cartes pour le deck 1
-        Card card1ForDeck1 = cardRepository.save(new Card(deck1, "a", "b"));
-        Card card2ForDeck1 = cardRepository.save(new Card(deck1, "d", "bbdsfsf"));
-        Card card3ForDeck1 = cardRepository.save(new Card(deck1, "dfd", "b"));
+        Card card1 = new Card(deck1, "front1", "back1");
+        Card card2 = new Card(deck1, "front2", "back2");
+        Card card3 = new Card(deck1, "front3", "back3");
 
         // Création d'une carte pour le deck 3
-        Card card1ForDeck3 = cardRepository.save(new Card(deck3, "dfdsfsdfsfd", "vcxvxcb"));
+        Card card4 = new Card(deck3, "front4", "back4");
+
+        this.cardRepository.save(Arrays.asList(card1, card2, card3, card4));
     }
 }
