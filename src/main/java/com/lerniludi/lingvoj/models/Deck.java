@@ -29,12 +29,9 @@ public class Deck {
 
     /**
      * Constructeur
-     *
-     * NOTE: Contrairement a Card, pour ne pas avoir d'erreurs sur la route /cards,
-     * il faut que la propriété ici soit protected et non pas private.
-     * Je ne sais pas pourquoi, par contre.
      */
-    protected Deck() {}
+    private Deck() {
+    }
 
     /**
      * Constructeur
