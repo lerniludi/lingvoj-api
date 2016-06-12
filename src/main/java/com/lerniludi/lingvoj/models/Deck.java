@@ -38,9 +38,4 @@ public class Deck {
     public Deck(String name) {
         this.name = name;
     }
-
-    public Deck(String name, List<Card> cards) {
-        this.name = name;
-        this.cards = cards;
-    }
 }
