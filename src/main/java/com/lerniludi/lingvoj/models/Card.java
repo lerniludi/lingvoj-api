@@ -31,6 +31,13 @@ public class Card {
      */
     private Card() {}
 
+    /**
+     * Constructeur
+     *
+     * @param deck  (required) paquet auquel est rattachée la carte
+     * @param front (required) côté face de la carte
+     * @param back  (required) côté retournée de la carte
+     */
     public Card(Deck deck, String front, String back) {
         this.deck = deck;
         this.front = front;
