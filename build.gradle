@@ -18,6 +18,7 @@ jar {
 	baseName = 'lingvoj'
 	version = '0.0.1-SNAPSHOT'
 }
+
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
@@ -26,11 +27,18 @@ repositories {
 }
 
 dependencies {
-    compile('org.projectlombok:lombok:1.12.6')
-	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-    compile("org.springframework.boot:spring-boot-starter-data-rest")
+    // Connecteur de la base de données
     compile("com.h2database:h2")
-	testCompile('org.springframework.boot:spring-boot-starter-test') 
+    // Getter/Setters automatique dans les modèles
+    compile('org.projectlombok:lombok:1.12.6')
+    // Web MVC
+    compile('org.springframework.boot:spring-boot-starter-web')
+    // ORM
+	compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    // Outils développeurs, restart auto
+    compile("org.springframework.boot:spring-boot-devtools")
+    // Outils de test
+    testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
 javadoc {
