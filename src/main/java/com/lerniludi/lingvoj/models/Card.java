@@ -25,8 +25,7 @@ public class Card {
     /**
      * Constructeur
      */
-    private Card() {
-    }
+    private Card() { }
 
     /**
      * Constructeur

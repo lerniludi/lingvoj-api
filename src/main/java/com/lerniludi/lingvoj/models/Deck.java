@@ -27,8 +27,7 @@ public class Deck {
     /**
      * Constructeur
      */
-    private Deck() {
-    }
+    private Deck() { }
 
     /**
      * Constructeur

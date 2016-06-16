@@ -11,25 +11,16 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 
 /**
- * Données à insérer par défaut dans la base de données
+ * Initialisation des données à insérer par défaut dans la base de données
  */
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-    private final DeckRepository deckRepository;
-    private final CardRepository cardRepository;
-
-    /**
-     * Constructeur
-     *
-     * @param deckRepository (required)
-     * @param cardRepository (required)
-     */
     @Autowired
-    public DatabaseLoader(DeckRepository deckRepository, CardRepository cardRepository) {
-        this.deckRepository = deckRepository;
-        this.cardRepository = cardRepository;
-    }
+    private DeckRepository deckRepository;
+
+    @Autowired
+    private CardRepository cardRepository;
 
     /**
      * Création des decks par défaut, avec leurs cartes associées
