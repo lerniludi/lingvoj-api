@@ -1,5 +1,6 @@
 package com.lerniludi.lingvoj.models;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -22,6 +23,7 @@ public class Deck {
     private String name;
 
     @OneToMany(mappedBy = "deck")
+    @JsonIgnore
     private List<Card> cards;
 
     /**

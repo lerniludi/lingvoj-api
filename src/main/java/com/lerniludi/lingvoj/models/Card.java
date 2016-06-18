@@ -1,5 +1,6 @@
 package com.lerniludi.lingvoj.models;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,6 +17,7 @@ public class Card {
     private Long id;
 
     @ManyToOne
+    @JsonIgnore
     private Deck deck;
 
     private String front;
