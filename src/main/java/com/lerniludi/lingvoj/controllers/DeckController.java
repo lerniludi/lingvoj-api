@@ -1,10 +1,9 @@
 package com.lerniludi.lingvoj.controllers;
 
-import com.lerniludi.lingvoj.dtos.DeckDto;
+import com.lerniludi.lingvoj.dtos.DeckDTO;
 import com.lerniludi.lingvoj.exceptions.NotFoundException;
 import com.lerniludi.lingvoj.models.Deck;
 import com.lerniludi.lingvoj.repositories.DeckRepository;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +18,6 @@ import java.util.stream.Collectors;
 public class DeckController {
 
     @Autowired
-    private ModelMapper modelMapper;
-
-    @Autowired
     private DeckRepository deckRepository;
 
     /**
@@ -30,8 +26,8 @@ public class DeckController {
      * @return Iterable<Deck>
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public List<DeckDto> index() {
-        return this.deckRepository.findAll().stream().map(deck -> convertToDto(deck)).collect(Collectors.toList());
+    public List<DeckDTO> index() {
+        return this.deckRepository.findAll().stream().map(deck -> DeckDTO.serialize(deck)).collect(Collectors.toList());
     }
 
     /**
@@ -42,22 +38,9 @@ public class DeckController {
      * @throws NotFoundException
      */
     @RequestMapping(value = "/{deckId}", method = RequestMethod.GET)
-    public Deck show(@PathVariable Long deckId) {
-        return this.deckRepository.findById(deckId)
+    public DeckDTO show(@PathVariable Long deckId) {
+        Deck deck = this.deckRepository.findById(deckId)
                 .orElseThrow(() -> new NotFoundException("Le paquet de cartes n'a pas été trouvé"));
+        return DeckDTO.serialize(deck);
     }
-
-    /**
-     * TODO: J'aime vraiment pas la conversion entité => dto (et dto => entité dans l'exemple du @see)
-     *       A déplacer autre part ?
-     *
-     * @see http://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application
-     * @param deck
-     * @return
-     */
-    private DeckDto convertToDto(Deck deck) {
-        DeckDto deckDto = modelMapper.map(deck, DeckDto.class);
-        return deckDto;
-    }
-
 }

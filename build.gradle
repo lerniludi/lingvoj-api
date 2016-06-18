@@ -31,8 +31,6 @@ dependencies {
     compile("com.h2database:h2")
     // Getter/Setters automatique dans les modèles
     compile('org.projectlombok:lombok:1.12.6')
-    // Gestion des DTO
-    compile('org.modelmapper:modelmapper:0.7.5')
     // Web MVC
     compile('org.springframework.boot:spring-boot-starter-web')
     // ORM
