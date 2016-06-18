@@ -1,10 +1,15 @@
 package com.lerniludi.lingvoj.controllers;
 
+import com.lerniludi.lingvoj.dtos.DeckDto;
 import com.lerniludi.lingvoj.exceptions.NotFoundException;
 import com.lerniludi.lingvoj.models.Deck;
 import com.lerniludi.lingvoj.repositories.DeckRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller des paquets de cartes
@@ -12,6 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping(value = "/decks")
 public class DeckController {
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Autowired
     private DeckRepository deckRepository;
@@ -22,8 +30,8 @@ public class DeckController {
      * @return Iterable<Deck>
      */
     @RequestMapping(value = "", method = RequestMethod.GET)
-    public Iterable<Deck> index() {
-        return this.deckRepository.findAll();
+    public List<DeckDto> index() {
+        return this.deckRepository.findAll().stream().map(deck -> convertToDto(deck)).collect(Collectors.toList());
     }
 
     /**
@@ -38,4 +46,18 @@ public class DeckController {
         return this.deckRepository.findById(deckId)
                 .orElseThrow(() -> new NotFoundException("Le paquet de cartes n'a pas été trouvé"));
     }
+
+    /**
+     * TODO: J'aime vraiment pas la conversion entité => dto (et dto => entité dans l'exemple du @see)
+     *       A déplacer autre part ?
+     *
+     * @see http://www.baeldung.com/entity-to-and-from-dto-for-a-java-spring-application
+     * @param deck
+     * @return
+     */
+    private DeckDto convertToDto(Deck deck) {
+        DeckDto deckDto = modelMapper.map(deck, DeckDto.class);
+        return deckDto;
+    }
+
 }
