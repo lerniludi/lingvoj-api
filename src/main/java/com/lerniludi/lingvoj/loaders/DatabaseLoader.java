@@ -1,40 +1,49 @@
 package com.lerniludi.lingvoj.loaders;
 
+import com.lerniludi.lingvoj.models.Card;
 import com.lerniludi.lingvoj.models.Deck;
+import com.lerniludi.lingvoj.repositories.CardRepository;
 import com.lerniludi.lingvoj.repositories.DeckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
- * Données à insérer par défaut dans la base de données
+ * Initialisation des données à insérer par défaut dans la base de données
  */
 @Component
 public class DatabaseLoader implements CommandLineRunner {
 
-    private final DeckRepository deckRepository;
+    @Autowired
+    private DeckRepository deckRepository;
+
+    @Autowired
+    private CardRepository cardRepository;
 
     /**
-     * Constructeur
+     * Création des decks par défaut, avec leurs cartes associées
      *
-     * @param deckRepository (required)
+     * @param args
+     * @throws Exception
      */
-    @Autowired
-    public DatabaseLoader(DeckRepository deckRepository) {
-        this.deckRepository = deckRepository;
-    }
-
     @Override
     public void run(String... args) throws Exception {
+        // Création des decks
+        Deck deck1 = new Deck("Deck 1");
+        Deck deck2 = new Deck("Deck 2");
+        Deck deck3 = new Deck("Deck 3");
+        this.deckRepository.save(Arrays.asList(deck1, deck2, deck3));
 
-        // Création des decks par défaut
-        ArrayList<Deck> defaultDecks = new ArrayList<>();
-        defaultDecks.add(new Deck("Deck 1"));
-        defaultDecks.add(new Deck("Deck 2"));
-        defaultDecks.add(new Deck("Deck 3"));
+        // Création de 3 cartes pour le deck 1
+        Card card1 = new Card(deck1, "front1", "back1");
+        Card card2 = new Card(deck1, "front2", "back2");
+        Card card3 = new Card(deck1, "front3", "back3");
 
-        this.deckRepository.save(defaultDecks);
+        // Création d'une carte pour le deck 3
+        Card card4 = new Card(deck3, "front4", "back4");
+
+        this.cardRepository.save(Arrays.asList(card1, card2, card3, card4));
     }
 }

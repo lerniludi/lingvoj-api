@@ -1,27 +1,35 @@
 package com.lerniludi.lingvoj.models;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.*;
+import lombok.Data;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import java.util.List;
 
 /**
  * Entité représentant un paquet de cartes
  */
 @Entity
+@Data
 public class Deck {
 
     @Id
     @GeneratedValue
-    @Getter @Setter private Long id;
-    @Getter @Setter private String name;
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "deck")
+    @JsonIgnore
+    private List<Card> cards;
 
     /**
      * Constructeur
      */
-    private Deck() {}
+    private Deck() { }
 
     /**
      * Constructeur
