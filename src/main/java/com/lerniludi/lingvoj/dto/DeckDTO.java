@@ -11,6 +11,7 @@ public class DeckDTO {
 
     private long id;
     private String name;
+    private int cardsCount;
 
     /**
      * Permet de sérialiser un objet deck en sa DTO
@@ -21,6 +22,7 @@ public class DeckDTO {
         DeckDTO deckDTO = new DeckDTO();
         deckDTO.setId(deck.getId());
         deckDTO.setName(deck.getName());
+        deckDTO.setCardsCount(deck.getCards().size());
 
         return deckDTO;
     }
