@@ -1,4 +1,4 @@
-package com.lerniludi.lingvoj.models;
+package com.lerniludi.lingvoj.model;
 
 import com.fasterxml.jackson.annotation.*;
 import lombok.Data;

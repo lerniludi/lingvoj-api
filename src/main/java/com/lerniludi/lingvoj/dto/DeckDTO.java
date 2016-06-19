@@ -1,6 +1,6 @@
-package com.lerniludi.lingvoj.dtos;
+package com.lerniludi.lingvoj.dto;
 
-import com.lerniludi.lingvoj.models.Deck;
+import com.lerniludi.lingvoj.model.Deck;
 import lombok.Data;
 
 /**

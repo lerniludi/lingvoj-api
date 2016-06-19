@@ -1,9 +1,9 @@
-package com.lerniludi.lingvoj.controllers;
+package com.lerniludi.lingvoj.controller;
 
-import com.lerniludi.lingvoj.dtos.DeckDTO;
-import com.lerniludi.lingvoj.exceptions.NotFoundException;
-import com.lerniludi.lingvoj.models.Deck;
-import com.lerniludi.lingvoj.repositories.DeckRepository;
+import com.lerniludi.lingvoj.dto.DeckDTO;
+import com.lerniludi.lingvoj.exception.NotFoundException;
+import com.lerniludi.lingvoj.model.Deck;
+import com.lerniludi.lingvoj.repository.DeckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

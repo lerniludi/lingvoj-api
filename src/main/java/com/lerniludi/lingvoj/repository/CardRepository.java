@@ -1,6 +1,6 @@
-package com.lerniludi.lingvoj.repositories;
+package com.lerniludi.lingvoj.repository;
 
-import com.lerniludi.lingvoj.models.Card;
+import com.lerniludi.lingvoj.model.Card;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.Optional;

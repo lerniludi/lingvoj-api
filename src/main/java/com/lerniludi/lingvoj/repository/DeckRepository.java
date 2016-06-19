@@ -1,6 +1,6 @@
-package com.lerniludi.lingvoj.repositories;
+package com.lerniludi.lingvoj.repository;
 
-import com.lerniludi.lingvoj.models.Deck;
+import com.lerniludi.lingvoj.model.Deck;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.Collection;

@@ -1,9 +1,9 @@
-package com.lerniludi.lingvoj.loaders;
+package com.lerniludi.lingvoj.loader;
 
-import com.lerniludi.lingvoj.models.Card;
-import com.lerniludi.lingvoj.models.Deck;
-import com.lerniludi.lingvoj.repositories.CardRepository;
-import com.lerniludi.lingvoj.repositories.DeckRepository;
+import com.lerniludi.lingvoj.model.Card;
+import com.lerniludi.lingvoj.model.Deck;
+import com.lerniludi.lingvoj.repository.CardRepository;
+import com.lerniludi.lingvoj.repository.DeckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
