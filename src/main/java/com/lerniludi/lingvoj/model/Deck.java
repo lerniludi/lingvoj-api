@@ -7,6 +7,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,6 +23,8 @@ public class Deck {
     @GeneratedValue
     private Long id;
 
+    @NotNull
+    @Size(min = 2)
     private String name;
 
     @OneToMany(mappedBy = "deck")
@@ -29,7 +34,9 @@ public class Deck {
     /**
      * Constructeur
      */
-    private Deck() { }
+    public Deck() {
+        this.cards = new ArrayList<>();
+    }
 
     /**
      * Constructeur
@@ -38,5 +45,6 @@ public class Deck {
      */
     public Deck(String name) {
         this.name = name;
+        this.cards = new ArrayList<>();
     }
 }

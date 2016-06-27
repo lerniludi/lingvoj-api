@@ -31,6 +31,18 @@ public class DeckController {
     }
 
     /**
+     * Créé un paquet de cartes
+     *
+     * @return Iterable<Deck>
+     */
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public DeckDTO create(@RequestBody DeckDTO deckDTO) {
+        Deck deck = deckDTO.deserialize();
+        this.deckRepository.save(deck);
+        return DeckDTO.serialize(deck);
+    }
+
+    /**
      * Retourne les données associées à un paquet de cartes
      *
      * @param deckId (required) l'identifiant du paquet de carte
