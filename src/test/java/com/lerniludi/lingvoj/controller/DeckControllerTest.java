@@ -1,8 +1,11 @@
 package com.lerniludi.lingvoj.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lerniludi.lingvoj.LingvojApplication;
 import com.lerniludi.lingvoj.dto.DeckDTO;
 import com.lerniludi.lingvoj.model.Deck;
+import com.lerniludi.lingvoj.repository.CardRepository;
 import com.lerniludi.lingvoj.repository.DeckRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,6 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,7 +30,10 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = LingvojApplication.class)
 @WebIntegrationTest
+@DirtiesContext
 public class DeckControllerTest {
+
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private RestTemplate restTemplate = new TestRestTemplate();
 
@@ -56,11 +66,41 @@ public class DeckControllerTest {
     }
 
     /**
+     * Test de la méthode de création d'un paquet de cartes
+     *
+     * @throws Exception
+     */
+    @Test
+    @DirtiesContext
+    public void create() throws JsonProcessingException {
+        // Création d'un deck avec nom valide
+        DeckDTO deckSource = new DeckDTO();
+        deckSource.setName("Super Deck");
+
+        // Création de headers JSON valides
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        // Appel de la méthode de création de paquet de carte
+        HttpEntity httpEntity = new HttpEntity(OBJECT_MAPPER.writeValueAsString(deckSource), requestHeaders);
+        DeckDTO deck = restTemplate.postForObject("http://localhost:8080/decks", httpEntity, DeckDTO.class);
+
+        // Validation des attributs du paquet de cartes nouvellement créé
+        assertTrue(deck.getId() == 4);
+        assertTrue(deck.getName().equals("Super Deck"));
+        assertTrue(deck.getCardsCount() == 0);
+
+        // Effacement du deck créé
+        deckRepository.delete(deck.getId());
+    }
+
+    /**
      * Test de la méthode de récupération d'un paquet de cartes
      *
      * @throws Exception
      */
     @Test
+    @DirtiesContext
     public void show() throws Exception {
         // Création d'un deck pour les tests
         Deck deckSource = new Deck("Nouveau deck");
@@ -73,8 +113,5 @@ public class DeckControllerTest {
         assertTrue(deck.getId() == deckSource.getId());
         assertTrue(deck.getName().equals("Nouveau deck"));
         assertTrue(deck.getCardsCount() == 0);
-
-        // Effacement du deck créé
-        deckRepository.delete(deckSource.getId());
     }
 }
