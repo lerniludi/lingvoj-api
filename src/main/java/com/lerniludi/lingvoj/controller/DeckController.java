@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = "/decks")
-public class DeckController {
+public class DeckController extends LingvojController {
 
     @Autowired
     private DeckRepository deckRepository;
@@ -55,7 +55,8 @@ public class DeckController {
     @RequestMapping(value = "/{deckId}", method = RequestMethod.PUT)
     public DeckDTO update(@PathVariable Long deckId, @RequestBody DeckDTO deckDTO) {
         this.deckRepository.findById(deckId)
-                .orElseThrow(() -> new NotFoundException("Le paquet de cartes n'a pas été trouvé"));
+                .orElseThrow(() -> new NotFoundException(
+                        getTranslation("error.notFound", new Object[]{getEntityNameTranslated()})));
         Deck deck = deckDTO.deserialize();
         deck.setId(deckId);
         this.deckRepository.save(deck);
@@ -72,7 +73,8 @@ public class DeckController {
     @RequestMapping(value = "/{deckId}", method = RequestMethod.GET)
     public DeckDTO show(@PathVariable Long deckId) {
         Deck deck = this.deckRepository.findById(deckId)
-                .orElseThrow(() -> new NotFoundException("Le paquet de cartes n'a pas été trouvé"));
+                .orElseThrow(() -> new NotFoundException(
+                        getTranslation("error.notFound", new Object[]{getEntityNameTranslated()})));
         return DeckDTO.serialize(deck);
     }
 }
