@@ -54,9 +54,11 @@ public class DeckController extends LingvojController {
      */
     @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.PUT)
     public DeckDTO update(@PathVariable Long deckId, @RequestBody DeckDTO deckDTO) {
-        this.deckRepository.findById(deckId)
-                .orElseThrow(() -> new NotFoundException(
-                        getTranslation("error.notFound", new Object[]{getEntityNameTranslated()})));
+        if (!this.deckRepository.exists(deckId)) {
+            throw new NotFoundException(
+                    getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
+        }
+
         Deck deck = deckDTO.deserialize();
         deck.setId(deckId);
         this.deckRepository.save(deck);
