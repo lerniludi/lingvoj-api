@@ -52,7 +52,7 @@ public class DeckController extends LingvojController {
      * @return DeckDTO
      * @throws NotFoundException
      */
-    @RequestMapping(value = "/{deckId}", method = RequestMethod.PUT)
+    @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.PUT)
     public DeckDTO update(@PathVariable Long deckId, @RequestBody DeckDTO deckDTO) {
         this.deckRepository.findById(deckId)
                 .orElseThrow(() -> new NotFoundException(
@@ -70,7 +70,7 @@ public class DeckController extends LingvojController {
      * @return DeckDTO
      * @throws NotFoundException
      */
-    @RequestMapping(value = "/{deckId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.GET)
     public DeckDTO show(@PathVariable Long deckId) {
         Deck deck = this.deckRepository.findById(deckId)
                 .orElseThrow(() -> new NotFoundException(
