@@ -36,21 +36,13 @@ public class DeckDTO {
     /**
      * Permet de désérialiser une DTO de Deck en son Deck correspondant
      *
-     * @param deckDTO (required) DTO de paquet de cartes à sérialiser
      * @return Deck
      */
-    public static Deck deserialize(DeckDTO deckDTO) {
+    public Deck deserialize() {
         Deck deck = new Deck();
 
-        deck.setName(deckDTO.getName());
+        deck.setName(this.name);
 
         return deck;
     }
-
-    /**
-     * Permet de désérialiser une DTO de Deck en son Deck correspondant
-     *
-     * @return Deck
-     */
-    public Deck deserialize() { return DeckDTO.deserialize(this); }
 }
