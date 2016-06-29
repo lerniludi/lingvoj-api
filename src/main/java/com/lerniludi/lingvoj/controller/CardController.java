@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping(value = "/decks/{deckId:\\d+}/cards")
-public class CardController {
+public class CardController extends LingvojController {
 
     @Autowired
     private DeckRepository deckRepository;
@@ -41,6 +41,6 @@ public class CardController {
     @RequestMapping(value = "/{cardId:\\d+}", method = RequestMethod.GET)
     public Card show(@PathVariable Long cardId) {
         return this.cardRepository.findById(cardId)
-                .orElseThrow(() -> new NotFoundException("La carte n'a pas été trouvée"));
+                .orElseThrow(() -> new NotFoundException(getTranslation("error.notFound", new Object[]{getEntityNameTranslated()})));
     }
 }
