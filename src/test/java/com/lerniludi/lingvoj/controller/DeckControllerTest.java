@@ -84,14 +84,39 @@ public class DeckControllerTest {
         // Appel de la méthode de création de paquet de carte
         HttpEntity httpEntity = new HttpEntity(OBJECT_MAPPER.writeValueAsString(deckSource), requestHeaders);
         DeckDTO deck = restTemplate.postForObject("http://localhost:8080/decks", httpEntity, DeckDTO.class);
+    }
 
-        // Validation des attributs du paquet de cartes nouvellement créé
-        assertTrue(deck.getId() == 4);
-        assertTrue(deck.getName().equals("Super Deck"));
-        assertTrue(deck.getCardsCount() == 0);
+    @Test
+    @DirtiesContext
+    public void update() throws Exception {
+        // Création d'un deck source des modifications à effectuer
+        Deck deckSource = new Deck("Deck à mettre à jour");
+        deckRepository.save(deckSource);
 
-        // Effacement du deck créé
-        deckRepository.delete(deck.getId());
+        // Création d'une DTO de deck pour envoi à l'API afin de modifier les données de la source
+        DeckDTO deckPut = new DeckDTO();
+        deckPut.setName("Deck mis à jour");
+
+        // Création de headers JSON valides pour la requête d'API à venir
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+
+        // Appel de la méthode d'édition de paquet de cartes
+        HttpEntity httpEntity = new HttpEntity(OBJECT_MAPPER.writeValueAsString(deckPut).getBytes("UTF-8"), requestHeaders);
+        ResponseEntity<DeckDTO> response = restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId(),
+            HttpMethod.PUT, httpEntity, DeckDTO.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        DeckDTO deckResponse = response.getBody();
+        assertTrue(deckResponse.getId() == deckSource.getId());
+        assertTrue(deckResponse.getName().equals("Deck mis à jour"));
+        assertTrue(deckResponse.getCardsCount() == 0);
+
+        // Validation des modifications en base
+        Deck deckPersisted = this.deckRepository.findOne(deckResponse.getId());
+        assertTrue(deckPersisted.getId() == deckSource.getId());
+        assertTrue(deckPersisted.getName().equals("Deck mis à jour"));
     }
 
     /**
