@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lerniludi.lingvoj.LingvojApplication;
 import com.lerniludi.lingvoj.dto.DeckDTO;
 import com.lerniludi.lingvoj.model.Deck;
-import com.lerniludi.lingvoj.repository.CardRepository;
 import com.lerniludi.lingvoj.repository.DeckRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
@@ -73,17 +70,27 @@ public class DeckControllerTest {
     @Test
     @DirtiesContext
     public void create() throws JsonProcessingException {
-        // Création d'un deck avec nom valide
+        // Création d'une DTO de deck à envoyer à l'API pour création
         DeckDTO deckSource = new DeckDTO();
         deckSource.setName("Super Deck");
 
-        // Création de headers JSON valides
+        // Appel de la méthode de création de paquet de carte
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-        // Appel de la méthode de création de paquet de carte
         HttpEntity httpEntity = new HttpEntity(OBJECT_MAPPER.writeValueAsString(deckSource), requestHeaders);
-        DeckDTO deck = restTemplate.postForObject("http://localhost:8080/decks", httpEntity, DeckDTO.class);
+        ResponseEntity<DeckDTO> response = restTemplate.exchange("http://localhost:8080/decks/",
+                HttpMethod.POST, httpEntity, DeckDTO.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        DeckDTO deckResponse = response.getBody();
+        assertTrue(deckResponse.getId() == 4);
+        assertTrue(deckResponse.getName().equals("Super Deck"));
+        assertTrue(deckResponse.getCardsCount() == 0);
+
+        // Validation des données en base
+        Deck deckPersisted = this.deckRepository.findOne(deckResponse.getId());
+        assertTrue(deckPersisted.getName().equals("Super Deck"));
     }
 
     @Test
