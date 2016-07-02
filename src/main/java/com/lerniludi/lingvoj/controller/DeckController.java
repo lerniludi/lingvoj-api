@@ -43,7 +43,6 @@ public class DeckController extends LingvojController {
         return DeckDTO.serialize(deck);
     }
 
-
     /**
      * Met à jour un maquet de cartes
      *
@@ -63,6 +62,20 @@ public class DeckController extends LingvojController {
         deck.setId(deckId);
         this.deckRepository.save(deck);
         return DeckDTO.serialize(deck);
+    }
+
+    /**
+     * Supprime un maquet de cartes
+     *
+     * @param deckId (required) l'identifiant du paquet de carte
+     * @throws NotFoundException
+     */
+    @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.DELETE)
+    public void delete(@PathVariable Long deckId) {
+        if (deckRepository.deleteById(deckId) == 0) {
+            throw new NotFoundException(
+                    getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
+        }
     }
 
     /**
