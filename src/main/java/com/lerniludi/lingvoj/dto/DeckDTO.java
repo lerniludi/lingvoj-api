@@ -3,6 +3,7 @@ package com.lerniludi.lingvoj.dto;
 import com.lerniludi.lingvoj.model.Deck;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -13,6 +14,8 @@ public class DeckDTO {
 
     private long id;
 
+    @NotNull
+    @Size(min = 2)
     private String name;
 
     private int cardsCount;
