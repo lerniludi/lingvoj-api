@@ -2,6 +2,7 @@ package com.lerniludi.lingvoj.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.LinkedNode;
 import com.lerniludi.lingvoj.LingvojApplication;
 import com.lerniludi.lingvoj.dto.DeckDTO;
 import com.lerniludi.lingvoj.model.Deck;
@@ -16,6 +17,8 @@ import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.LinkedHashMap;
 
 import static org.junit.Assert.*;
 
@@ -91,6 +94,39 @@ public class DeckControllerTest {
         // Validation des données en base
         Deck deckPersisted = this.deckRepository.findOne(deckResponse.getId());
         assertTrue(deckPersisted.getName().equals("Super Deck"));
+    }
+
+    /**
+     * Test de la méthode de création d'un paquet de cartes avec des paquets de cartes inutiles
+     *
+     * @throws Exception
+     */
+    @Test
+    public void createInvalid() throws JsonProcessingException {
+        // Création d'une DTO de deck à envoyer à l'API pour création
+        DeckDTO deckSource = new DeckDTO();
+        createInvalid_requestWithAssert(deckSource);
+
+        deckSource.setName("a");
+        createInvalid_requestWithAssert(deckSource);
+    }
+
+    /**
+     * Effectue une requête de création ou un caractère de mauvaise requête est attendu
+     *
+     * @param deck
+     * @throws JsonProcessingException
+     */
+    private void createInvalid_requestWithAssert(DeckDTO deck) throws JsonProcessingException {
+        // Appel de la méthode de création de paquet de carte
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(deck), requestHeaders);
+        ResponseEntity<LinkedHashMap> response = restTemplate.exchange("http://localhost:8080/decks/",
+                HttpMethod.POST, httpEntity, LinkedHashMap.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.BAD_REQUEST);
     }
 
     @Test
