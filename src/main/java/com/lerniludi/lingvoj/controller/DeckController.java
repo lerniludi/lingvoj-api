@@ -7,6 +7,7 @@ import com.lerniludi.lingvoj.repository.DeckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class DeckController extends LingvojController {
      * @return DeckDTO
      */
     @RequestMapping(value = "", method = RequestMethod.POST)
-    public DeckDTO create(@RequestBody DeckDTO deckDTO) {
+    public DeckDTO create(@RequestBody @Valid DeckDTO deckDTO) {
         Deck deck = deckDTO.deserialize();
         this.deckRepository.save(deck);
         return DeckDTO.serialize(deck);
@@ -52,7 +53,7 @@ public class DeckController extends LingvojController {
      * @throws NotFoundException
      */
     @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.PUT)
-    public DeckDTO update(@PathVariable Long deckId, @RequestBody DeckDTO deckDTO) {
+    public DeckDTO update(@PathVariable Long deckId, @RequestBody @Valid DeckDTO deckDTO) {
         if (!this.deckRepository.exists(deckId)) {
             throw new NotFoundException(
                     getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
