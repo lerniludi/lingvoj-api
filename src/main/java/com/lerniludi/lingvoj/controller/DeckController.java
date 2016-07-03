@@ -71,7 +71,7 @@ public class DeckController extends LingvojController {
      * @throws NotFoundException
      */
     @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.DELETE)
-    public void delete(@PathVariable Long deckId) {
+    public void destroy(@PathVariable Long deckId) {
         if (deckRepository.deleteById(deckId) == 0) {
             throw new NotFoundException(
                     getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
