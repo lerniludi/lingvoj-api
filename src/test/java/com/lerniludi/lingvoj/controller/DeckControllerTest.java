@@ -126,6 +126,28 @@ public class DeckControllerTest {
         assertTrue(deckPersisted.getName().equals("Deck mis à jour"));
     }
 
+    @Test
+    @DirtiesContext
+    public void destroy() {
+        // Création d'un deck source qui devra être supprimé par l'appel de l'API
+        Deck deckSource = new Deck("Deck à supprimer");
+        deckRepository.save(deckSource);
+
+        // Appel de la méthode de suppression de paquet de carte
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity httpEntity = new HttpEntity(null, requestHeaders);
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId(),
+                HttpMethod.DELETE, httpEntity, String.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        assertTrue(response.getBody() == null);
+
+        // Validation des modifications en base
+        assertTrue(!this.deckRepository.exists(deckSource.getId()));
+    }
+
     /**
      * Test de la méthode de récupération d'un paquet de cartes
      *
