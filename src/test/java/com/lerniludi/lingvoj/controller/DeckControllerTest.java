@@ -1,5 +1,7 @@
 package com.lerniludi.lingvoj.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lerniludi.lingvoj.LingvojApplication;
 import com.lerniludi.lingvoj.dto.DeckDTO;
 import com.lerniludi.lingvoj.model.Deck;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
+import org.springframework.http.*;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
@@ -23,7 +27,10 @@ import static org.junit.Assert.*;
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = LingvojApplication.class)
 @WebIntegrationTest
+@DirtiesContext
 public class DeckControllerTest {
+
+    public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private RestTemplate restTemplate = new TestRestTemplate();
 
@@ -56,11 +63,96 @@ public class DeckControllerTest {
     }
 
     /**
+     * Test de la méthode de création d'un paquet de cartes
+     *
+     * @throws Exception
+     */
+    @Test
+    @DirtiesContext
+    public void create() throws JsonProcessingException {
+        // Création d'une DTO de deck à envoyer à l'API pour création
+        DeckDTO deckSource = new DeckDTO();
+        deckSource.setName("Super Deck");
+
+        // Appel de la méthode de création de paquet de carte
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(deckSource), requestHeaders);
+        ResponseEntity<DeckDTO> response = restTemplate.exchange("http://localhost:8080/decks/",
+                HttpMethod.POST, httpEntity, DeckDTO.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        DeckDTO deckResponse = response.getBody();
+        assertTrue(deckResponse.getId() == 4);
+        assertTrue(deckResponse.getName().equals("Super Deck"));
+        assertTrue(deckResponse.getCardsCount() == 0);
+
+        // Validation des données en base
+        Deck deckPersisted = this.deckRepository.findOne(deckResponse.getId());
+        assertTrue(deckPersisted.getName().equals("Super Deck"));
+    }
+
+    @Test
+    @DirtiesContext
+    public void update() throws Exception {
+        // Création d'un deck source des modifications à effectuer
+        Deck deckSource = new Deck("Deck à mettre à jour");
+        deckRepository.save(deckSource);
+
+        // Création d'une DTO de deck pour envoi à l'API afin de modifier les données de la source
+        DeckDTO deckPut = new DeckDTO();
+        deckPut.setName("Deck mis à jour");
+
+        // Appel de la méthode d'édition de paquet de cartes
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(deckPut).getBytes("UTF-8"), requestHeaders);
+        ResponseEntity<DeckDTO> response = restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId(),
+            HttpMethod.PUT, httpEntity, DeckDTO.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        DeckDTO deckResponse = response.getBody();
+        assertTrue(deckResponse.getId() == deckSource.getId());
+        assertTrue(deckResponse.getName().equals("Deck mis à jour"));
+        assertTrue(deckResponse.getCardsCount() == 0);
+
+        // Validation des modifications en base
+        Deck deckPersisted = this.deckRepository.findOne(deckResponse.getId());
+        assertTrue(deckPersisted.getId().equals(deckSource.getId()));
+        assertTrue(deckPersisted.getName().equals("Deck mis à jour"));
+    }
+
+    @Test
+    @DirtiesContext
+    public void destroy() {
+        // Création d'un deck source qui devra être supprimé par l'appel de l'API
+        Deck deckSource = new Deck("Deck à supprimer");
+        deckRepository.save(deckSource);
+
+        // Appel de la méthode de suppression de paquet de carte
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(null, requestHeaders);
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId(),
+                HttpMethod.DELETE, httpEntity, String.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        assertTrue(response.getBody() == null);
+
+        // Validation des modifications en base
+        assertTrue(!this.deckRepository.exists(deckSource.getId()));
+    }
+
+    /**
      * Test de la méthode de récupération d'un paquet de cartes
      *
      * @throws Exception
      */
     @Test
+    @DirtiesContext
     public void show() throws Exception {
         // Création d'un deck pour les tests
         Deck deckSource = new Deck("Nouveau deck");
@@ -73,8 +165,5 @@ public class DeckControllerTest {
         assertTrue(deck.getId() == deckSource.getId());
         assertTrue(deck.getName().equals("Nouveau deck"));
         assertTrue(deck.getCardsCount() == 0);
-
-        // Effacement du deck créé
-        deckRepository.delete(deckSource.getId());
     }
 }

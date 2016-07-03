@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 @RestController
 @RequestMapping(value = "/decks")
-public class DeckController {
+public class DeckController extends LingvojController {
 
     @Autowired
     private DeckRepository deckRepository;
@@ -31,16 +31,65 @@ public class DeckController {
     }
 
     /**
+     * Créé un paquet de cartes
+     *
+     * @param deckDTO (required) Données du deck a mettre à jour
+     * @return DeckDTO
+     */
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public DeckDTO create(@RequestBody DeckDTO deckDTO) {
+        Deck deck = deckDTO.deserialize();
+        this.deckRepository.save(deck);
+        return DeckDTO.serialize(deck);
+    }
+
+    /**
+     * Met à jour un maquet de cartes
+     *
+     * @param deckId (required) l'identifiant du paquet de carte
+     * @param deckDTO (required) Données du deck a mettre à jour
+     * @return DeckDTO
+     * @throws NotFoundException
+     */
+    @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.PUT)
+    public DeckDTO update(@PathVariable Long deckId, @RequestBody DeckDTO deckDTO) {
+        if (!this.deckRepository.exists(deckId)) {
+            throw new NotFoundException(
+                    getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
+        }
+
+        Deck deck = deckDTO.deserialize();
+        deck.setId(deckId);
+        this.deckRepository.save(deck);
+        return DeckDTO.serialize(deck);
+    }
+
+    /**
+     * Supprime un maquet de cartes
+     *
+     * @param deckId (required) l'identifiant du paquet de carte
+     * @throws NotFoundException
+     */
+    @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.DELETE)
+    public void destroy(@PathVariable Long deckId) {
+        if (deckRepository.deleteById(deckId) == 0) {
+            throw new NotFoundException(
+                    getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
+        }
+    }
+
+    /**
      * Retourne les données associées à un paquet de cartes
      *
      * @param deckId (required) l'identifiant du paquet de carte
-     * @return Deck
+     * @return DeckDTO
      * @throws NotFoundException
      */
-    @RequestMapping(value = "/{deckId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{deckId:\\d+}", method = RequestMethod.GET)
     public DeckDTO show(@PathVariable Long deckId) {
         Deck deck = this.deckRepository.findById(deckId)
-                .orElseThrow(() -> new NotFoundException("Le paquet de cartes n'a pas été trouvé"));
+                .orElseThrow(() -> new NotFoundException(
+                        getTranslation("error.notFound", new Object[]{getEntityNameTranslated()})));
         return DeckDTO.serialize(deck);
     }
 }
