@@ -77,7 +77,7 @@ public class DeckControllerTest {
         // Appel de la méthode de création de paquet de carte
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity httpEntity = new HttpEntity(OBJECT_MAPPER.writeValueAsString(deckSource), requestHeaders);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(deckSource), requestHeaders);
         ResponseEntity<DeckDTO> response = restTemplate.exchange("http://localhost:8080/decks/",
                 HttpMethod.POST, httpEntity, DeckDTO.class);
 
@@ -104,12 +104,10 @@ public class DeckControllerTest {
         DeckDTO deckPut = new DeckDTO();
         deckPut.setName("Deck mis à jour");
 
-        // Création de headers JSON valides pour la requête d'API à venir
+        // Appel de la méthode d'édition de paquet de cartes
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-        // Appel de la méthode d'édition de paquet de cartes
-        HttpEntity httpEntity = new HttpEntity(OBJECT_MAPPER.writeValueAsString(deckPut).getBytes("UTF-8"), requestHeaders);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(deckPut).getBytes("UTF-8"), requestHeaders);
         ResponseEntity<DeckDTO> response = restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId(),
             HttpMethod.PUT, httpEntity, DeckDTO.class);
 
@@ -122,7 +120,7 @@ public class DeckControllerTest {
 
         // Validation des modifications en base
         Deck deckPersisted = this.deckRepository.findOne(deckResponse.getId());
-        assertTrue(deckPersisted.getId() == deckSource.getId());
+        assertTrue(deckPersisted.getId().equals(deckSource.getId()));
         assertTrue(deckPersisted.getName().equals("Deck mis à jour"));
     }
 
@@ -136,7 +134,7 @@ public class DeckControllerTest {
         // Appel de la méthode de suppression de paquet de carte
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity httpEntity = new HttpEntity(null, requestHeaders);
+        HttpEntity<?> httpEntity = new HttpEntity<>(null, requestHeaders);
         ResponseEntity<String> response = restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId(),
                 HttpMethod.DELETE, httpEntity, String.class);
 
