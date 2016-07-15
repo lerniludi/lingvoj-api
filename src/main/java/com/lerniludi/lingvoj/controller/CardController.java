@@ -9,6 +9,7 @@ import com.lerniludi.lingvoj.repository.DeckRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,58 @@ public class CardController extends LingvojController {
     @RequestMapping(method = RequestMethod.GET)
     public List<CardDTO> index(@ModelAttribute("deck") Deck deck) {
         return deck.getCards().stream().map(card -> CardDTO.serialize(card)).collect(Collectors.toList());
+    }
+
+    /**
+     * Créé une carte avec association à un paquet
+     *
+     * @param deck (required) Paquet de carte associé à la carte à créer
+     * @param cardDTO (required) Carte à créer
+     * @return CardDTO
+     */
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    public CardDTO create(@ModelAttribute("deck") Deck deck, @RequestBody @Valid CardDTO cardDTO) {
+        Card card = cardDTO.deserialize();
+        card.setDeck(deck);
+        this.cardRepository.save(card);
+        return CardDTO.serialize(card);
+    }
+
+    /**
+     * Met à jour une carte d'un paquet
+     *
+     * @param cardId (required) Identifiant de la carte à mettre à jour
+     * @param deck (required) Paquet de carte associé à la carte
+     * @param cardDTO (required) Carte à mettre à jour
+     * @return CardDTO
+     * @throws NotFoundException
+     */
+    @RequestMapping(value = "/{cardId:\\d+}", method = RequestMethod.PUT)
+    public CardDTO update(@PathVariable Long cardId, @ModelAttribute("deck") Deck deck,
+                          @RequestBody @Valid CardDTO cardDTO) {
+        if (this.cardRepository.countByIdAndDeck(cardId, deck) == 0) {
+            throw new NotFoundException(getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
+        }
+
+        Card card = cardDTO.deserialize();
+        card.setId(cardId);
+        card.setDeck(deck);
+        this.cardRepository.save(card);
+        return CardDTO.serialize(card);
+    }
+
+    /**
+     * Supprime une carte associée à un paquet
+     *
+     * @param deck (required) Paquet de carte associé à la carte à supprimer
+     * @param cardId (required) Carte à supprimer
+     * @throws NotFoundException
+     */
+    @RequestMapping(value = "/{cardId:\\d+}", method = RequestMethod.DELETE)
+    public void destroy(@ModelAttribute("deck") Deck deck, @PathVariable Long cardId) {
+        if (cardRepository.deleteByIdAndDeck(cardId, deck) == 0) {
+            throw new NotFoundException(getTranslation("error.notFound", new Object[]{getEntityNameTranslated()}));
+        }
     }
 
     /**
