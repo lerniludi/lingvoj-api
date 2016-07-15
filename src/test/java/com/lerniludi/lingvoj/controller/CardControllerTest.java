@@ -51,7 +51,7 @@ public class CardControllerTest {
     @Test
     public void index() throws Exception {
         // Récupération des cartes associées au paquet de carte 1 de l'API
-        CardDTO[] cards = restTemplate.getForObject("http://localhost:8080/decks/1/cards", CardDTO[].class);
+        CardDTO[] cards = this.restTemplate.getForObject("http://localhost:8080/decks/1/cards", CardDTO[].class);
 
         // Validation du nombre de cartes du paquet de carte 1
         assertTrue(cards.length == 3);
@@ -68,10 +68,111 @@ public class CardControllerTest {
         assertTrue(cards[2].getBack().equals("back3"));
 
         // Récupération des cartes associées au paquet de carte 2 de l'API
-        cards = restTemplate.getForObject("http://localhost:8080/decks/2/cards", CardDTO[].class);
+        cards = this.restTemplate.getForObject("http://localhost:8080/decks/2/cards", CardDTO[].class);
 
         // Validation du nombre de cartes du paquet de carte 2
         assertTrue(cards.length == 0);
+    }
+
+    /**
+     * Test de la méthode de création d'une carte associée à un paquet
+     *
+     * @throws Exception
+     */
+    @Test
+    @DirtiesContext
+    public void create() throws Exception {
+        // Récupération du deck pour lequel sera créé la carte
+        Deck deckSource = this.deckRepository.findById((long) 2).get();
+
+        // Création d'une DTO de carte à envoyer à l'API pour création
+        CardDTO cardSource = new CardDTO();
+        cardSource.setFront("Face");
+        cardSource.setBack("Dos");
+
+        // Appel de la méthode de création d'une carte associée à un paquet
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(cardSource), requestHeaders);
+        ResponseEntity<CardDTO> response = this.restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId() +
+                "/cards", HttpMethod.POST, httpEntity, CardDTO.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        CardDTO cardResponse = response.getBody();
+        assertTrue(cardResponse.getId() == 5);
+        assertTrue(cardResponse.getFront().equals(cardSource.getFront()));
+        assertTrue(cardResponse.getBack().equals(cardSource.getBack()));
+
+        // Validation des données en base
+        Card cardPersisted = this.cardRepository.findByIdAndDeck(cardResponse.getId(), deckSource).get();
+        assertTrue(cardPersisted.getId() == 5);
+        assertTrue(cardPersisted.getFront().equals(cardSource.getFront()));
+        assertTrue(cardPersisted.getBack().equals(cardSource.getBack()));
+    }
+
+    /**
+     * Test de la méthode de mise à jour d'une carte associée à un paquet
+     *
+     * @throws Exception
+     */
+    @Test
+    @DirtiesContext
+    public void update() throws Exception {
+        // Récupération du deck pour lequel sera créé la carte
+        Deck deckSource = this.deckRepository.findById((long) 2).get();
+
+        // Création d'une carte source des modifications à effectuer
+        Card cardSource = new Card(deckSource, "Front", "Back");
+        this.cardRepository.save(cardSource);
+
+        // Création d'une DTO de carte pour envoi à l'API afin de modifier les données de la source
+        CardDTO cardPut = new CardDTO();
+        cardPut.setFront("Nouveau front");
+        cardPut.setBack("Nouveau back");
+
+        // Appel de la méthode d'édition d'une carte associée à un paquet
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(cardPut).getBytes("UTF-8"), requestHeaders);
+        ResponseEntity<CardDTO> response = this.restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId() +
+                "/cards/" + cardSource.getId(), HttpMethod.PUT, httpEntity, CardDTO.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        CardDTO cardResponse = response.getBody();
+        assertTrue(cardResponse.getId() == cardSource.getId());
+        assertTrue(cardResponse.getFront().equals(cardPut.getFront()));
+        assertTrue(cardResponse.getBack().equals(cardPut.getBack()));
+
+        // Validation des modifications en base
+        Card cardPersisted = this.cardRepository.findByIdAndDeck(cardSource.getId(), deckSource).get();
+        assertTrue(cardPersisted.getId() == cardSource.getId());
+        assertTrue(cardPersisted.getFront().equals(cardPut.getFront()));
+        assertTrue(cardPersisted.getBack().equals(cardPut.getBack()));
+    }
+
+    @Test
+    @DirtiesContext
+    public void destroy() {
+        // Création d'une carte associée au Deck 2 qui sera supprimée dans les tests
+        Deck deckSource = this.deckRepository.findById((long) 2).get();
+        Card cardSource = new Card(deckSource, "Carte", "à supprimer");
+        this.cardRepository.save(cardSource);
+
+        // Appel de la méthode de suppression de paquet de carte
+        HttpHeaders requestHeaders = new HttpHeaders();
+        requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<?> httpEntity = new HttpEntity<>(null, requestHeaders);
+        ResponseEntity<String> response = this.restTemplate.exchange("http://localhost:8080/decks/" + deckSource.getId() +
+                "/cards/" + cardSource.getId(), HttpMethod.DELETE, httpEntity, String.class);
+
+        // Validation des données reçues
+        assertTrue(response.getStatusCode() == HttpStatus.OK);
+        assertTrue(response.getBody() == null);
+
+        // Validation de la suppression de la carte en base de données
+        assertTrue(this.cardRepository.countByIdAndDeck(cardSource.getId(), deckSource) == 0);
     }
 
     /**
@@ -88,7 +189,7 @@ public class CardControllerTest {
         this.cardRepository.save(cardSource);
 
         // Récupération de la DTO de carte correspondant à la Card préalablement crée
-        CardDTO card = restTemplate.getForObject("http://localhost:8080/decks/" + deckSource.getId() +
+        CardDTO card = this.restTemplate.getForObject("http://localhost:8080/decks/" + deckSource.getId() +
                 "/cards/" + cardSource.getId(), CardDTO.class);
 
         // Validation des attributs de la carte
@@ -101,7 +202,7 @@ public class CardControllerTest {
         HttpHeaders requestHeaders = new HttpHeaders();
         requestHeaders.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<?> httpEntity = new HttpEntity<>(OBJECT_MAPPER.writeValueAsString(cardSource).getBytes("UTF-8"), requestHeaders);
-        ResponseEntity<LinkedHashMap> response = restTemplate.exchange("http://localhost:8080/decks/1/" +
+        ResponseEntity<LinkedHashMap> response = this.restTemplate.exchange("http://localhost:8080/decks/1/" +
                         "/cards/" + cardSource.getId(), HttpMethod.GET, httpEntity, LinkedHashMap.class);
 
         // Validation des données reçues
