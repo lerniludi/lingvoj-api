@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 
 /**
  * Entité représentant une carte
@@ -27,7 +28,7 @@ public class Card {
     /**
      * Constructeur
      */
-    private Card() { }
+    public Card() { }
 
     /**
      * Constructeur
